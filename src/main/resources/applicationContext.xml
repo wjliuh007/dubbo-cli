@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans     
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/cache
+        http://www.springframework.org/schema/cache/spring-cache-3.2.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd "
+	default-lazy-init="false">
+	<mvc:annotation-driven />
+	<context:component-scan base-package="cn.wjliuh.dubbo"/>
+	<dubbo:application name="dubbo_client"></dubbo:application>
+	<!--使用zookeeper注册中心暴露服务地址 -->
+	<dubbo:registry address="zookeeper://127.0.0.1:2181" timeout="100000" />
+
+	<!--要引用的服务 -->
+	<!-- 客户端要引用的服务 -->
+	<dubbo:reference id="dubboservice"	interface="cn.wjliuh.dubbo.itf.HelloWordInterface" />
+	
+		<!-- HandlerMapping -->
+	<bean
+		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" />
+	<!-- HandlerAdapter -->
+	<bean
+		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+
+		<property name="messageConverters">
+			<list>
+				<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+					<property name="features">
+						<array value-type="com.alibaba.fastjson.serializer.SerializerFeature">
+							<value>WriteDateUseDateFormat</value>
+							<value>WriteMapNullValue</value>
+						</array>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+    
+    <!-- Mapping exception to the handler view -->
+    <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+            </props>
+        </property>
+    </bean>
+</beans>
